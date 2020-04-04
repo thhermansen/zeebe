@@ -1,0 +1,29 @@
+{
+    "name": "zeebe",
+    "prettier": "@opronto/eslint-config-pronto/.prettierrc.json",
+    "eslintConfig": {
+        "extends": "@opronto/eslint-config-pronto",
+        "parserOptions": {
+            "project": "./tsconfig.eslint.json"
+        }
+    },
+    "devDependencies": {
+        "@types/node": "^8.0.0",
+        "@opronto/eslint-config-pronto": "^0.4.0",
+        "@typescript-eslint/eslint-plugin": "^2.26.0",
+        "@typescript-eslint/parser": "^2.26.0",
+        "eslint": "^6.8.0",
+        "eslint-config-prettier": "^6.10.1",
+        "eslint-plugin-prettier": "^3.1.2",
+        "jest": "^25.2.7",
+        "jest-fetch-mock": "^3.0.3",
+        "prettier": "^2.0.2",
+        "ts-jest": "^25.3.0",
+        "typescript": "^3.8.3"
+    },
+    "dependencies": {
+        "@pulumi/kubernetes": "^1.0.0",
+        "@pulumi/kubernetesx": "^0.1.1",
+        "@pulumi/pulumi": "^1.0.0"
+    }
+}

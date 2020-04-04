@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "devops"
+		},
+		{
+			"path": ".",
+			"name": "root"
+		}
+	],
+	"settings": {
+		"eslint.workingDirectories": [
+			{
+			  "directory": "./devops",
+			  "changeProcessCWD": true
+			},
+		],
+	}
+}
