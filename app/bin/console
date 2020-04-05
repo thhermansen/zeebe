@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+
+ts-node -O '{"noUnusedLocals": false}' -r tsconfig-paths/register

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_15m8wc6" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Zeebe Modeler" exporterVersion="0.8.0">
+  <bpmn:message id="Message_0tymlhq" name="paymentReceived">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="orderId" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:process id="orderPlaced" name="Process order" isExecutable="true">
+    <bpmn:laneSet id="LaneSet_1aubw31" />
+    <bpmn:sequenceFlow id="SequenceFlow_0b0yjdn" name="Sweden" sourceRef="ExclusiveGateway_06xu8nz" targetRef="Task_0122npe">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">country == "Sweden"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0h69z4i" sourceRef="StartEvent_1" targetRef="Task_06ds9rl" />
+    <bpmn:sequenceFlow id="SequenceFlow_0nff8iu" sourceRef="Task_06ds9rl" targetRef="IntermediateThrowEvent_1x8sudh" />
+    <bpmn:sequenceFlow id="SequenceFlow_103sk0u" sourceRef="IntermediateThrowEvent_1x8sudh" targetRef="ExclusiveGateway_06xu8nz" />
+    <bpmn:sequenceFlow id="SequenceFlow_1m3u51p" sourceRef="Task_0122npe" targetRef="ExclusiveGateway_0h0il3l" />
+    <bpmn:sequenceFlow id="SequenceFlow_1pgg2z2" sourceRef="Task_126qjoy" targetRef="ExclusiveGateway_0h0il3l" />
+    <bpmn:sequenceFlow id="SequenceFlow_0705ioi" sourceRef="ExclusiveGateway_0h0il3l" targetRef="Task_1q61mmn" />
+    <bpmn:sequenceFlow id="SequenceFlow_070xgn0" sourceRef="Task_1q61mmn" targetRef="EndEvent_0vpmowp" />
+    <bpmn:sequenceFlow id="SequenceFlow_0q5wd9o" name="Norway" sourceRef="ExclusiveGateway_06xu8nz" targetRef="Task_126qjoy">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">country == "Norway"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="Task_1q61mmn" name="Send Shipment Notification">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="sendShipmentNotification" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0705ioi</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_070xgn0</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_0vpmowp" name="Order Fulfilled">
+      <bpmn:incoming>SequenceFlow_070xgn0</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0h0il3l" name="Shipment Funnel">
+      <bpmn:incoming>SequenceFlow_1m3u51p</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1pgg2z2</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0705ioi</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_0122npe" name="Ship in Sweden">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="shipSweden" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0b0yjdn</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1m3u51p</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_06xu8nz" name="Country to ship from?">
+      <bpmn:incoming>SequenceFlow_103sk0u</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1q0ful2</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0b0yjdn</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0q5wd9o</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_126qjoy" name="Ship in Norway">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="shipNorway" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0q5wd9o</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1pgg2z2</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="IntermediateThrowEvent_1x8sudh" name="Payment Received">
+      <bpmn:incoming>SequenceFlow_0nff8iu</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_103sk0u</bpmn:outgoing>
+      <bpmn:messageEventDefinition messageRef="Message_0tymlhq" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="Task_06ds9rl" name="Initiate Payment">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="initiatePayment" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0h69z4i</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0nff8iu</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:startEvent id="StartEvent_1" name="Order placed">
+      <bpmn:outgoing>SequenceFlow_0h69z4i</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:boundaryEvent id="IntermediateThrowEvent_0ii8bv7" name="Shipment Too Large&#10;" attachedToRef="Task_0122npe">
+      <bpmn:outgoing>SequenceFlow_0d6ekku</bpmn:outgoing>
+      <bpmn:errorEventDefinition errorRef="Error_0cl7tnz" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0d6ekku" sourceRef="IntermediateThrowEvent_0ii8bv7" targetRef="Task_0bbaz24" />
+    <bpmn:serviceTask id="Task_0bbaz24" name="Try Norway instead">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="setCountry" />
+        <zeebe:taskHeaders>
+          <zeebe:header key="country" value="Norway" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0d6ekku</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1q0ful2</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1q0ful2" sourceRef="Task_0bbaz24" targetRef="ExclusiveGateway_06xu8nz" />
+  </bpmn:process>
+  <bpmn:error id="Error_0cl7tnz" name="Shipment too large" errorCode="shipmentTooLarge" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="orderPlaced">
+      <bpmndi:BPMNEdge id="SequenceFlow_0q5wd9o_di" bpmnElement="SequenceFlow_0q5wd9o">
+        <di:waypoint x="670" y="225" />
+        <di:waypoint x="670" y="120" />
+        <di:waypoint x="810" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="702" y="170" width="38" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_070xgn0_di" bpmnElement="SequenceFlow_070xgn0">
+        <di:waypoint x="1250" y="240" />
+        <di:waypoint x="1352" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0705ioi_di" bpmnElement="SequenceFlow_0705ioi">
+        <di:waypoint x="1075" y="240" />
+        <di:waypoint x="1150" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1pgg2z2_di" bpmnElement="SequenceFlow_1pgg2z2">
+        <di:waypoint x="910" y="120" />
+        <di:waypoint x="1050" y="120" />
+        <di:waypoint x="1050" y="215" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1m3u51p_di" bpmnElement="SequenceFlow_1m3u51p">
+        <di:waypoint x="910" y="360" />
+        <di:waypoint x="1050" y="360" />
+        <di:waypoint x="1050" y="265" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_103sk0u_di" bpmnElement="SequenceFlow_103sk0u">
+        <di:waypoint x="478" y="250" />
+        <di:waypoint x="645" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0nff8iu_di" bpmnElement="SequenceFlow_0nff8iu">
+        <di:waypoint x="370" y="250" />
+        <di:waypoint x="442" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0h69z4i_di" bpmnElement="SequenceFlow_0h69z4i">
+        <di:waypoint x="218" y="250" />
+        <di:waypoint x="270" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0b0yjdn_di" bpmnElement="SequenceFlow_0b0yjdn">
+        <di:waypoint x="670" y="275" />
+        <di:waypoint x="670" y="360" />
+        <di:waypoint x="810" y="360" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="700" y="315" width="40" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="182" y="232" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="168" y="275" width="64" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1brag9m_di" bpmnElement="Task_06ds9rl">
+        <dc:Bounds x="270" y="210" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IntermediateCatchEvent_0rib25n_di" bpmnElement="IntermediateThrowEvent_1x8sudh">
+        <dc:Bounds x="442" y="232" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="438" y="275" width="46" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0uptbiw_di" bpmnElement="Task_126qjoy">
+        <dc:Bounds x="810" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0zaoyww_di" bpmnElement="ExclusiveGateway_06xu8nz" isMarkerVisible="true">
+        <dc:Bounds x="645" y="225" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="713" y="243" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0p5wj2n_di" bpmnElement="Task_0122npe">
+        <dc:Bounds x="810" y="320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0h0il3l_di" bpmnElement="ExclusiveGateway_0h0il3l" isMarkerVisible="true">
+        <dc:Bounds x="1025" y="215" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="938" y="243" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0vpmowp_di" bpmnElement="EndEvent_0vpmowp">
+        <dc:Bounds x="1352" y="222" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1335" y="265" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_06kd1lb_di" bpmnElement="Task_1q61mmn">
+        <dc:Bounds x="1150" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BoundaryEvent_0jsjtqt_di" bpmnElement="IntermediateThrowEvent_0ii8bv7">
+        <dc:Bounds x="862" y="382" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="896" y="425" width="68" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0d6ekku_di" bpmnElement="SequenceFlow_0d6ekku">
+        <di:waypoint x="880" y="418" />
+        <di:waypoint x="880" y="480" />
+        <di:waypoint x="620" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0y34ilh_di" bpmnElement="Task_0bbaz24">
+        <dc:Bounds x="520" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1q0ful2_di" bpmnElement="SequenceFlow_1q0ful2">
+        <di:waypoint x="570" y="440" />
+        <di:waypoint x="570" y="390" />
+        <di:waypoint x="660" y="265" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

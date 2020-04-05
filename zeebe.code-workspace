@@ -1,19 +1,24 @@
 {
 	"folders": [
 		{
+			"name": "app",
+			"path": "app"
+		},
+		{
+			"name": "devops",
 			"path": "devops"
 		},
 		{
-			"path": ".",
-			"name": "root"
+			"name": "root",
+			"path": "."
 		}
 	],
 	"settings": {
-		"eslint.workingDirectories": [
-			{
-			  "directory": "./devops",
-			  "changeProcessCWD": true
-			},
-		],
+		// "eslint.workingDirectories": [
+		// 	{
+		// 	  "directory": "./devops",
+		// 	  "changeProcessCWD": true
+		// 	},
+		// ],
 	}
 }

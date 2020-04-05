@@ -1,0 +1,51 @@
+{
+  "name": "@opronto/package-name",
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "author": "Gudleik Rasch <gudleik@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com/opronto/REPONAME.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/",
+    "access": "restricted"
+  },
+  "files": [
+    "lib/**/*",
+    "package.json",
+    "README.md"
+  ],
+  "prettier": "@opronto/eslint-config-pronto/.prettierrc.json",
+  "eslintConfig": {
+    "extends": "@opronto/eslint-config-pronto",
+    "parserOptions": {
+      "project": "./tsconfig.eslint.json"
+    }
+  },
+  "scripts": {
+    "clean": "rm -fr lib",
+    "postpack": "npm run clean",
+    "prepack": "npm run lint && npm run test && npm run build",
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint --ext ts src"
+  },
+  "devDependencies": {
+    "@opronto/eslint-config-pronto": "^0.4.0",
+    "@typescript-eslint/eslint-plugin": "^2.26.0",
+    "@typescript-eslint/parser": "^2.26.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.1",
+    "eslint-plugin-prettier": "^3.1.2",
+    "prettier": "^2.0.2",
+    "ts-node": "^8.8.2",
+    "tsconfig-paths": "^3.9.0",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "zeebe-node": "^0.23.0-alpha.3"
+  }
+}
