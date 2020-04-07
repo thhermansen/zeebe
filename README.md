@@ -5,10 +5,11 @@
 # Example app
 
 ```bash
-kubectl port-forward svc/zeebe-cluster-zeebe-gateway 26500:26500 -n zeebe-thorbjorn
+kubectl port-forward svc/zeebe-cluster-zeebe-gateway 26500:26500 -n zeebe-thorbjorn # Run in a terminal of it's own
 
 cd app
 
+bin/worker # Run in a terminal of it's own
 bin/console
 ```
 
