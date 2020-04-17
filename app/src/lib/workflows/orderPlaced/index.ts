@@ -1,9 +1,5 @@
-import {ZBClient} from 'zeebe-node'
 import * as world from './world'
-
-function workflowLocation(filename: string) {
-  return `${__dirname}/${filename}`
-}
+import Workflow from '@workflows/workflow'
 
 interface OrderPlacedParams {
   orderId: number
@@ -17,27 +13,8 @@ interface OrderShippedParams extends OrderPlacedParams {
   shippedBy: ShipValue
 }
 
-export default class OrderWorkflow {
-  static logger = console
-
-  static client = new ZBClient()
+export default class OrderWorkflow extends Workflow {
   static workflowId = 'orderPlaced'
-
-  /**
-   * Deploys the workflow
-   *
-   * @param client The client we communicate with ZeeBe via
-   */
-  static async deploy() {
-    const path = workflowLocation(`${this.workflowId}.bpmn`)
-
-    try {
-      const res = await this.client.deployWorkflow(path)
-      this.logger.info(`DEPLOYED ${path}`, this.pretty(res))
-    } catch (error) {
-      this.logger.error(`FAILED deploy ${path}`, error)
-    }
-  }
 
   /**
    * An order is placed, initiate order process
@@ -54,7 +31,7 @@ export default class OrderWorkflow {
   /**
    * Start workers
    */
-  static async work() {
+  static work() {
     /**
      * WORKER: Initiate payment
      */
@@ -120,9 +97,5 @@ export default class OrderWorkflow {
 
       complete.success()
     })
-  }
-
-  private static pretty(obj: any) {
-    return JSON.stringify(obj, null, 2)
   }
 }

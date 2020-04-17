@@ -13,9 +13,11 @@ bin/worker # Run in a terminal of it's own
 bin/console
 ```
 
+## Order
+
 ```ts
 import {Duration} from 'zeebe-node'
-import OrderWorkflow from '@workflows/order'
+import OrderWorkflow from '@workflows/orderPlaced'
 
 // Will be a success :-)
 let orderId = 1
@@ -33,6 +35,33 @@ OrderWorkflow.client.publishMessage({ name: 'paymentReceived', correlationKey: '
 orderId = 5
 OrderWorkflow.orderPlaced({orderId, country: 'sweden'})
 OrderWorkflow.client.publishMessage({ name: 'paymentReceived', correlationKey: orderId.toString(), timeToLive: Duration.seconds.of(60), variables: {receivedAmount: 100} })
+```
+
+## OCR registration
+
+```ts
+import {Duration} from 'zeebe-node'
+import NetsOcrRegistration from '@workflows/netsOcrRegistration'
+
+let accountNumber = 1
+NetsOcrRegistration.schedule(accountNumber)
+
+NetsOcrRegistration.client.publishMessage({name: 'netsOcrAgreementPollStatusNow', correlationKey: accountNumber.toString(), timeToLive: Duration.seconds.of(60), variables: {} })
+```
+
+## OCR Poll
+
+```ts
+import {Duration} from 'zeebe-node'
+import NetsOcrPollFiles from '@workflows/netsOcrPollFiles'
+
+NetsOcrPollFiles.client.publishMessage({name: 'netsOcrPollFilesStart', correlationKey: 'pollJobSameKeyEnsuresSingleInstance', timeToLive: Duration.seconds.of(60), variables: {numberOfFiles: 0} })
+
+NetsOcrPollFiles.client.publishMessage({name: 'netsOcrPollFilesStart', correlationKey: 'pollJobSameKeyEnsuresSingleInstance', timeToLive: Duration.seconds.of(60), variables: {numberOfFiles: 2} })
+
+// File number 5, 6 and 7 will cause issue in parent process
+NetsOcrPollFiles.client.publishMessage({name: 'netsOcrPollFilesStart', correlationKey: 'pollJobSameKeyEnsuresSingleInstance', timeToLive: Duration.seconds.of(60), variables: {numberOfFiles: 7} })
+
 ```
 
 # Resources

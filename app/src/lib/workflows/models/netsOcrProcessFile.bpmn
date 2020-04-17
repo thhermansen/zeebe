@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0r4kh6g" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Zeebe Modeler" exporterVersion="0.8.0">
+  <bpmn:process id="netsOcrProcessFile" name="Nets OCR process file" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>SequenceFlow_0u7dvng</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0u7dvng" sourceRef="StartEvent_1" targetRef="Task_1coc7oc" />
+    <bpmn:serviceTask id="Task_1coc7oc" name="Parse OCR file, flat map to transactions">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="netsOcrParseAndFlatMapToTransactions" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0u7dvng</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0wdy8z5</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_17ubnwb">
+      <bpmn:incoming>SequenceFlow_0d1hbua</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0wdy8z5" sourceRef="Task_1coc7oc" targetRef="SubProcess_187l5da" />
+    <bpmn:subProcess id="SubProcess_187l5da" name="Register transaction as paid amoun in invoice">
+      <bpmn:incoming>SequenceFlow_0wdy8z5</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0d1hbua</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics>
+        <bpmn:extensionElements>
+          <zeebe:loopCharacteristics inputCollection="transactions" inputElement="transaction" outputCollection="results" outputElement="result" />
+        </bpmn:extensionElements>
+      </bpmn:multiInstanceLoopCharacteristics>
+      <bpmn:startEvent id="StartEvent_01tmd82">
+        <bpmn:outgoing>SequenceFlow_065k3j1</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:sequenceFlow id="SequenceFlow_065k3j1" sourceRef="StartEvent_01tmd82" targetRef="Task_03ukjy4" />
+      <bpmn:serviceTask id="Task_03ukjy4" name="Register a transaction&#39;s paid amount">
+        <bpmn:extensionElements>
+          <zeebe:taskDefinition type="netsOcrRegisterTransaction" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>SequenceFlow_065k3j1</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_13cw3vt</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:endEvent id="EndEvent_1f79a53">
+        <bpmn:incoming>SequenceFlow_13cw3vt</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="SequenceFlow_13cw3vt" sourceRef="Task_03ukjy4" targetRef="EndEvent_1f79a53" />
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="SequenceFlow_0d1hbua" sourceRef="SubProcess_187l5da" targetRef="EndEvent_17ubnwb" />
+    <bpmn:textAnnotation id="TextAnnotation_1wykeew">
+      <bpmn:text>An OCR file has: Transmission -&gt; many assignments -&gt; many transactions
+
+This worker reads OCR files and flat maps it in to a data structure downstream workers will consume as one transaction to be</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_0nngfm1" sourceRef="Task_1coc7oc" targetRef="TextAnnotation_1wykeew" />
+    <bpmn:textAnnotation id="TextAnnotation_1v55iel">
+      <bpmn:text>Shit can happen here, ex:
+
+- OCR agreement not active in our system for account number.
+- Don't find invoice, unknown KID
+- Amout not equal to invoice.
+- ..more?
+
+Needs to be handled within the sub-process.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_10pqy9j" sourceRef="SubProcess_187l5da" targetRef="TextAnnotation_1v55iel" />
+    <bpmn:textAnnotation id="TextAnnotation_1jfvn34">
+      <bpmn:text>TODO: Handle parse error</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_034v07s" sourceRef="Task_1coc7oc" targetRef="TextAnnotation_1jfvn34" />
+  </bpmn:process>
+  <bpmn:error id="Error_1rgacig" name="somethingWentWrong" errorCode="somethingWentWrong" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="netsOcrProcessFile">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="282" y="222" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0u7dvng_di" bpmnElement="SequenceFlow_0u7dvng">
+        <di:waypoint x="318" y="240" />
+        <di:waypoint x="369" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_1wykeew_di" bpmnElement="TextAnnotation_1wykeew">
+        <dc:Bounds x="160" y="80" width="430" height="68" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_0nngfm1_di" bpmnElement="Association_0nngfm1">
+        <di:waypoint x="405" y="200" />
+        <di:waypoint x="387" y="148" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0vhjh84_di" bpmnElement="Task_1coc7oc">
+        <dc:Bounds x="369" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_17ubnwb_di" bpmnElement="EndEvent_17ubnwb">
+        <dc:Bounds x="1052" y="222" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0wdy8z5_di" bpmnElement="SequenceFlow_0wdy8z5">
+        <di:waypoint x="469" y="240" />
+        <di:waypoint x="570" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="SubProcess_187l5da_di" bpmnElement="SubProcess_187l5da" isExpanded="true">
+        <dc:Bounds x="570" y="140" width="348" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_01tmd82_di" bpmnElement="StartEvent_01tmd82">
+        <dc:Bounds x="610" y="222" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_065k3j1_di" bpmnElement="SequenceFlow_065k3j1">
+        <di:waypoint x="646" y="240" />
+        <di:waypoint x="700" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0ijq0i1_di" bpmnElement="Task_03ukjy4">
+        <dc:Bounds x="700" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1f79a53_di" bpmnElement="EndEvent_1f79a53">
+        <dc:Bounds x="862" y="222" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_13cw3vt_di" bpmnElement="SequenceFlow_13cw3vt">
+        <di:waypoint x="800" y="240" />
+        <di:waypoint x="862" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0d1hbua_di" bpmnElement="SequenceFlow_0d1hbua">
+        <di:waypoint x="918" y="240" />
+        <di:waypoint x="1052" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_1v55iel_di" bpmnElement="TextAnnotation_1v55iel">
+        <dc:Bounds x="790" y="380" width="330" height="138" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_10pqy9j_di" bpmnElement="Association_10pqy9j">
+        <di:waypoint x="830" y="340" />
+        <di:waypoint x="870" y="360" />
+        <di:waypoint x="870" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_1jfvn34_di" bpmnElement="TextAnnotation_1jfvn34">
+        <dc:Bounds x="340" y="320" width="180" height="45" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_034v07s_di" bpmnElement="Association_034v07s">
+        <di:waypoint x="424" y="280" />
+        <di:waypoint x="428" y="320" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
