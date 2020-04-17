@@ -15,12 +15,17 @@ export default class ZeeBeCluster extends pulumi.ComponentResource {
     this.namespace = namespace
     this.dnsDomain = dnsDomain
 
+    const fetchOpts = {
+      repo: 'https://helm.zeebe.io',
+    }
+
     const cluster = new k8s.helm.v3.Chart(
       'zeebe-cluster',
       {
         chart: 'zeebe-cluster',
         repo: 'zeebe',
-        namespace: namespace,
+        namespace,
+        fetchOpts,
         transformations: [this.removeHelmHooksTransformation, this.fixBadMetadataNameForTestConnection],
       },
       {...opts, parent: this}
@@ -31,7 +36,8 @@ export default class ZeeBeCluster extends pulumi.ComponentResource {
       {
         chart: 'zeebe-operate',
         repo: 'zeebe',
-        namespace: namespace,
+        namespace,
+        fetchOpts,
         transformations: [this.removeHelmHooksTransformation, this.addHostToNginxIngress],
         values: {
           global: {
